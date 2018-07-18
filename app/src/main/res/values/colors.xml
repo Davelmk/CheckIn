@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorDrawerHead">#81010415</color>
+
+    <!--item颜色数组-->
+    <color name="colorSign1">#c414b346</color>
+    <color name="colorSign2">#81ec20ca</color>
+    <color name="colorSign3">#c1e97d09</color>
+    <color name="colorSign4">#c3849708</color>
+    <color name="colorSign5">#c1bc0f2e</color>
+    <color name="colorSign6">#ae19ae9a</color>
+</resources>

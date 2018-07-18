@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CheckIn</string>
+    <string name="email_error">请检查Email格式!</string>
+</resources>
