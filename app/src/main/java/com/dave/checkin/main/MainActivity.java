@@ -28,6 +28,7 @@ import com.dave.checkin.detail.CheckDetailActivity;
 import com.dave.checkin.group.CreatedActivity;
 import com.dave.checkin.group.JoinedActivity;
 import com.dave.checkin.utils.CheckinDBHelper;
+import com.dave.checkin.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void goToAddCheckIn(){
         Intent intent=new Intent(MainActivity.this,AddCheckActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, Utils.REQUEST_ADD_CHECKIN);
     }
 
     private void initList(){
@@ -209,6 +210,34 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.openDrawer(GravityCompat.START);
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode==Utils.REQUEST_ADD_CHECKIN&&resultCode==Utils.RESULT_ADD_CHECKIN){
+            Log.d("MainActivity","成功添加签到活动");
+            String objectId=data.getStringExtra("objectId");
+            addCheckinToList(objectId);
+            adapter.notifyItemInserted(0);
+        }
+    }
+
+    private void addCheckinToList(String objectId){
+        CheckinDBHelper dbHelper=new CheckinDBHelper(this,"CheckIn.db", null, 1);
+        db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query("checkin", null, "id="+objectId,
+                null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String title = cursor.getString(cursor.getColumnIndex("title"));
+                String owner = cursor.getString(cursor.getColumnIndex("owner"));
+                String num = cursor.getString(cursor.getColumnIndex("num"));
+                list.add(0,new CheckIn(title,owner,num));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        initList();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

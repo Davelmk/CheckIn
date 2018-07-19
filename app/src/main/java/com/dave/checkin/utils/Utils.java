@@ -12,6 +12,8 @@ import cn.bmob.v3.Bmob;
 
 public class Utils {
     public static final String ApplicationID="a1e5460c7fde5d0f0b0e5c3cb5e6ad2e";
+    public static final int REQUEST_ADD_CHECKIN=1;
+    public static final int RESULT_ADD_CHECKIN=1;
 
     public static int[] colors={R.color.colorSign1,R.color.colorSign2,
             R.color.colorSign3,R.color.colorSign4,R.color.colorSign5 ,R.color.colorSign6};

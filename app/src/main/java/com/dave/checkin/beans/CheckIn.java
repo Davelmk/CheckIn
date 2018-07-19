@@ -2,7 +2,9 @@ package com.dave.checkin.beans;
 
 import com.dave.checkin.utils.Utils;
 
-public class CheckIn {
+import cn.bmob.v3.BmobObject;
+
+public class CheckIn extends BmobObject{
     private String title;
     private String owner;
     private String description;
