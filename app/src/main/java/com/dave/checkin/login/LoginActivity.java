@@ -31,6 +31,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText login_password;
     private ProgressBar progressBar;
 
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         startActivity(intent);
     }
     private void goToMainView(){
-//        progressBar.setVisibility(View.INVISIBLE);
         Intent intent=new Intent(LoginActivity.this,MainActivity.class);
         startActivity(intent);
         finish();
@@ -75,6 +75,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putBoolean("isLogin",true);
+        editor.putString("userID",userID);
         editor.putString("account",login_account.getText().toString());
         editor.putString("password",login_password.getText().toString());
         editor.commit();
@@ -90,10 +91,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if(e==null){
                     Log.d("Login",list.get(0).getUsername());
                     Log.d("Login",list.get(0).getAccount());
+                    userID=list.get(0).getObjectId();
                     loginSuccess();
                 }else {
                     Log.d("Login",e.getMessage());
-                    Toast.makeText(LoginActivity.this,"用户不存在或者密码错误",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this,"账户或密码错误",Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.INVISIBLE);
                 }
             }

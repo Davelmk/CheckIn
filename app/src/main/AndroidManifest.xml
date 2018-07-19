@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dave.checkin">
+
     <!-- //获取设备网络状态，禁用后无法获取网络状态 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- //网络权限，当禁用后，无法进行检索等相关业务 -->
@@ -25,6 +26,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -64,8 +66,11 @@
         <activity
             android:name=".detail.GroupJoinedActivity"
             android:parentActivityName=".group.JoinedActivity" />
-        <activity android:name=".detail.GroupCreatedActivity"
-            android:parentActivityName=".group.CreatedActivity"/>
+        <activity
+            android:name=".detail.GroupCreatedActivity"
+            android:parentActivityName=".group.CreatedActivity" />
+        <activity android:name=".main.AddCheckActivity"
+            android:parentActivityName=".main.MainActivity"/>
     </application>
 
 </manifest>
