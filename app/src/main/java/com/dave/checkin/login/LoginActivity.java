@@ -32,6 +32,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private ProgressBar progressBar;
 
     private String userID;
+    private boolean isAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         editor.putString("userID",userID);
         editor.putString("account",login_account.getText().toString());
         editor.putString("password",login_password.getText().toString());
+        editor.putBoolean("isAdmin",isAdmin);
         editor.commit();
         goToMainView();
     }
@@ -92,6 +94,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Log.d("Login",list.get(0).getUsername());
                     Log.d("Login",list.get(0).getAccount());
                     userID=list.get(0).getObjectId();
+                    isAdmin=list.get(0).isAdmin();
                     loginSuccess();
                 }else {
                     Log.d("Login",e.getMessage());

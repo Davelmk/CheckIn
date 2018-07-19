@@ -11,6 +11,7 @@ public class CheckIn extends BmobObject{
     private String position;
     private String num;
     private transient String time;
+    private transient String id;
     private transient int backgroundColor;
 
     public CheckIn(String title, String owner) {
@@ -27,20 +28,18 @@ public class CheckIn extends BmobObject{
         this.title = title;
         this.owner = owner;
         this.num = num;
-        this.backgroundColor = Utils.getColor();
         this.time = "暂无时间";
         this.position = "暂无定位";
         this.description = "暂无描述";
+        this.backgroundColor = Utils.getColor();
     }
 
-    public CheckIn(String title, String owner, String description, String position, String num, String time, int backgroundColor) {
-        this.title = title;
-        this.owner = owner;
-        this.description = description;
-        this.position = position;
-        this.num = num;
-        this.time = time;
-        this.backgroundColor = backgroundColor;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
