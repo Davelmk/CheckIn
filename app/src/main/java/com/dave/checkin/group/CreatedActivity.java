@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -57,6 +59,34 @@ public class CreatedActivity extends AppCompatActivity {
 
     private void goToGroupCreatedDetail(){
         Intent intent=new Intent(CreatedActivity.this, GroupCreatedActivity.class);
+        intent.putExtra("title","群组1");
+        intent.putExtra("position","DLUT");
+        intent.putExtra("owner","Dave");
+        intent.putExtra("num","12");
+        intent.putExtra("time","2018-07-20");
+        intent.putExtra("description","description");
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.add_group:
+                Toast.makeText(CreatedActivity.this, "添加群组",
+                        Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.add_group,menu);
+        return true;
     }
 }

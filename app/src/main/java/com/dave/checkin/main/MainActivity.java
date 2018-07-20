@@ -74,12 +74,12 @@ public class MainActivity extends AppCompatActivity {
         add_checkin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checckUserLevel();
+                checckUserLevel1();
             }
         });
     }
 
-    private void checckUserLevel(){
+    private void checckUserLevel1(){
         SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
         boolean isAdmin=sharedPreferences.getBoolean("isAdmin",false);
         if (isAdmin){
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.joinedGroup:
                         Toast.makeText(MainActivity.this, item.getTitle(),
                                 Toast.LENGTH_SHORT).show();
-                        goToJoinedGroup();
+                        checckUserLevel2();
                         break;
                     case R.id.quit:
                         Toast.makeText(MainActivity.this, item.getTitle(),
@@ -227,7 +227,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    private void checckUserLevel2(){
+        SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
+        boolean isAdmin=sharedPreferences.getBoolean("isAdmin",false);
+        if (isAdmin){
+            Toast.makeText(MainActivity.this,"您是管理员用户",Toast.LENGTH_SHORT).show();
+        }else {
+            goToJoinedGroup();
+        }
+    }
     private void drawerOption(){
         if (drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(GravityCompat.START);
