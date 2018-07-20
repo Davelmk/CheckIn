@@ -33,19 +33,21 @@
                 android:textSize="15sp"
                 android:text="签到活动详情"/>
             <TextView
+                android:id="@+id/detail_num"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
-                android:text="已签到:17人"/>
+                android:text="已签到: 0人"/>
             <TextView
+                android:id="@+id/detail_createdDate"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
-                android:text="创建时间:2018-01-17"/>
+                android:text="创建时间: 2018-01-17"/>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -54,6 +56,7 @@
         android:layout_weight="1"
         android:orientation="vertical">
         <TextView
+            android:id="@+id/detail_owner"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:paddingLeft="20dp"
@@ -61,21 +64,34 @@
             android:gravity="center_vertical"
             android:background="#FFFFFF"
             android:textSize="17sp"
-            android:text="Owner: Dave"/>
+            android:text="创建者: Dave"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="#FFFFFF"
             android:orientation="horizontal"
             android:layout_marginBottom="5dp">
-            <TextView
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:paddingLeft="20dp"
-                android:gravity="center_vertical"
-                android:textSize="17sp"
-                android:text="创建地点: DLUT"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="20dp"
+                    android:gravity="center_vertical"
+                    android:textSize="17sp"
+                    android:text="创建地点: "/>
+                <TextView
+                    android:id="@+id/position_description"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:textSize="17sp"
+                    android:text="DLUT"/>
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/detail_position"
@@ -95,5 +111,14 @@
             android:background="#FFFFFF"
             android:textSize="17sp"
             android:text="话题讨论"/>
+        <TextView
+            android:id="@+id/detail_description"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:paddingLeft="20dp"
+            android:layout_margin="3dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/input"
+            android:hint="描述..."/>
     </LinearLayout>
 </LinearLayout>

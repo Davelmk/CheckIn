@@ -34,6 +34,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="RgiBiBfzoHdoLdg4DjuMElO23pAF8Fz0" >
+        </meta-data>
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" />
         <activity android:name=".login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -50,7 +58,7 @@
             android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".map.PositionActivity"
-            android:parentActivityName=".detail.CheckDetailActivity" />
+            android:parentActivityName=".detail.CheckDetailActivity"/>
         <activity
             android:name=".map.SignActivity"
             android:parentActivityName=".detail.CheckDetailActivity" />

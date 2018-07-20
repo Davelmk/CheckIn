@@ -23,7 +23,7 @@ import android.widget.Toast;
 import com.dave.checkin.R;
 import com.dave.checkin.adapter.CheckInAdapter;
 import com.dave.checkin.beans.CheckIn;
-import com.dave.checkin.beans.UserCheckin;
+import com.dave.checkin.beans.User;
 import com.dave.checkin.detail.CheckDetailActivity;
 import com.dave.checkin.group.CreatedActivity;
 import com.dave.checkin.group.JoinedActivity;
@@ -36,6 +36,7 @@ import java.util.List;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
 
 public class MainActivity extends AppCompatActivity {
     //抽屉布局
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
     //RecyclerView
     private RecyclerView recyclerView;
-    private List<CheckIn> list;
+    private List<CheckIn> checkInList;
     private CheckInAdapter adapter;
 
     //FloatingActionButton
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Utils.initBombSDK(this);
         setContentView(R.layout.activity_main);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         }
         drawerLayout=findViewById(R.id.drawer_layout);
         initNavigationView();
-        list=new ArrayList<>();
+        checkInList =new ArrayList<>();
         initList();
 //        getCheckinFromDB();
         getCheckinFromBmob();
@@ -96,64 +98,72 @@ public class MainActivity extends AppCompatActivity {
         recyclerView=findViewById(R.id.main_recyclerView);
         GridLayoutManager layoutManager=new GridLayoutManager(this,3);
         recyclerView.setLayoutManager(layoutManager);
-        adapter=new CheckInAdapter(this,list);
+        adapter=new CheckInAdapter(this, checkInList);
         adapter.setItemClickListener(new CheckInAdapter.MyItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(MainActivity.this, list.get(position).getTitle(),
+                Toast.makeText(MainActivity.this, checkInList.get(position).getTitle(),
                         Toast.LENGTH_SHORT).show();
-                Intent intent=new Intent(MainActivity.this,CheckDetailActivity.class);
-                startActivity(intent);
+                goToCheckDetailActivity(position);
             }
         });
         recyclerView.setAdapter(adapter);
     }
 
+    private void goToCheckDetailActivity(int position){
+        Intent intent=new Intent(MainActivity.this,CheckDetailActivity.class);
+        intent.putExtra("id",checkInList.get(position).getId());
+        intent.putExtra("title",checkInList.get(position).getTitle());
+        startActivity(intent);
+    }
+
+
     private void getCheckinFromBmob(){
-        list.clear();
+        checkInList.clear();
         SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
         String userid=sharedPreferences.getString("userID","");
 
-        BmobQuery<UserCheckin> query=new BmobQuery<>();
-        query.addWhereEqualTo("user",userid);
-        query.findObjects(new FindListener<UserCheckin>() {
+        BmobQuery<User> query=new BmobQuery<>();
+        query.getObject(userid, new QueryListener<User>() {
             @Override
-            public void done(List<UserCheckin> list, BmobException e) {
-                if (e==null){
-                    UserCheckin userCheckin=list.get(0);
-                    List<String> checkinList=userCheckin.getCheckin();
-                    Log.d("MainActivity","checkinList:"+checkinList.size());
+            public void done(User user, BmobException e) {
+                if (e == null) {
+                    List<String> checkinList = user.getCheckInList();
+                    Log.i("MainActivity", "初始化checkinList:" + checkinList.size());
                     getCheckinDetail(checkinList);
-                }
-                else {
-                    Log.d("MainActivity",e.getMessage());
+                } else {
+                    Log.d("MainActivity", e.getMessage());
                 }
             }
         });
     }
 
-    private void getCheckinDetail(List<String> checkin){
+    private void getCheckinDetail(final List<String> checkin){
+        Log.d("MainActivity",checkin.toString());
         BmobQuery<CheckIn> query=new BmobQuery<>();
-        query.addWhereContainedIn("objectId",checkin);
+        query.addWhereContainedIn("objectId", checkin);
         query.findObjects(new FindListener<CheckIn>() {
             @Override
             public void done(List<CheckIn> list, BmobException e) {
                 if (e==null){
-                   for (CheckIn checkIn:list){
-                       String title = checkIn.getTitle();
-                       String owner = checkIn.getOwner();
-                       String num = checkIn.getNum();
-                       list.add(new CheckIn(title,owner,num));
-                   }
-//                   initList();
-                    Log.d("MainActivity","List:"+list.size());
-                    adapter.notifyDataSetChanged();
+                    refreshList(list);
                 }
                 else {
-                    Log.d("MainActivity",e.getMessage());
+                    Log.d("Main",e.getMessage());
                 }
             }
         });
+
+    }
+    private void refreshList(List<CheckIn> list){
+        CheckIn temp=null;
+        for (CheckIn checkIn:list){
+            temp=new CheckIn(checkIn.getTitle(),checkIn.getOwner(),checkIn.getNum());
+            temp.setId(checkIn.getObjectId());
+            temp.setTime(checkIn.getCreatedAt());
+            checkInList.add(temp);
+        }
+        adapter.notifyDataSetChanged();
     }
 
     private void getCheckinFromDB(){
@@ -166,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
                 String title = cursor.getString(cursor.getColumnIndex("title"));
                 String owner = cursor.getString(cursor.getColumnIndex("owner"));
                 String num = cursor.getString(cursor.getColumnIndex("num"));
-                list.add(new CheckIn(title,owner,num));
+                checkInList.add(new CheckIn(title,owner,num));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -231,22 +241,26 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode==Utils.REQUEST_ADD_CHECKIN&&resultCode==Utils.RESULT_ADD_CHECKIN){
             Log.d("MainActivity","成功添加签到活动");
             String objectId=data.getStringExtra("objectId");
+            Log.d("MainActivity",objectId);
             addCheckinToListFromBmob(objectId);
-            adapter.notifyDataSetChanged();
         }
     }
 
     private void addCheckinToListFromBmob(String objectId){
         BmobQuery<CheckIn> query=new BmobQuery<>();
-        query.addQueryKeys(objectId);
-        query.findObjects(new FindListener<CheckIn>() {
+        query.getObject(objectId, new QueryListener<CheckIn>() {
             @Override
-            public void done(List<CheckIn> list, BmobException e) {
+            public void done(CheckIn checkIn, BmobException e) {
                 if(e==null){
-                    CheckIn checkIn=list.get(0);
-                    list.add(0,new CheckIn(checkIn.getTitle(),checkIn.getOwner(),checkIn.getNum()));
+                    Log.e("MainActivity",checkIn.getTitle()+","+checkIn.getOwner());
+                    CheckIn temp=new CheckIn(checkIn.getTitle(),checkIn.getOwner(),checkIn.getNum());
+                    temp.setId(checkIn.getObjectId());
+                    temp.setTime(checkIn.getCreatedAt());
+                    checkInList.add(temp);
+                    Log.e("MainActivity", checkInList.size()+"");
+                    adapter.notifyDataSetChanged();
                 }else {
-                    Log.i("MainActivity","失败："+e.getMessage()+","+e.getErrorCode());
+                    Log.e("MainActivity","失败："+e.getMessage()+","+e.getErrorCode());
                 }
             }
         });
@@ -262,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
                 String title = cursor.getString(cursor.getColumnIndex("title"));
                 String owner = cursor.getString(cursor.getColumnIndex("owner"));
                 String num = cursor.getString(cursor.getColumnIndex("num"));
-                list.add(0,new CheckIn(title,owner,num));
+                checkInList.add(0,new CheckIn(title,owner,num));
             } while (cursor.moveToNext());
         }
         cursor.close();

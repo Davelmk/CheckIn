@@ -78,6 +78,7 @@ public class RegisterActivity extends AppCompatActivity implements RadioGroup.On
 
     private void updateData(String username, String email, String pwd) {
         User user=new User(username,email,pwd,isAdmin);
+        Log.d("updateData","isAdmin:"+isAdmin);
         user.save(new SaveListener<String>() {
             @Override
             public void done(String s, BmobException e) {
@@ -96,9 +97,11 @@ public class RegisterActivity extends AppCompatActivity implements RadioGroup.On
         switch (checkedId) {
             case R.id.radio_user:
                 isAdmin=false;
+                Log.d("Register","isAdmin:"+isAdmin);
                 break;
             case R.id.radio_admin:
                 isAdmin=true;
+                Log.d("Register","isAdmin:"+isAdmin);
                 break;
             default:
                 break;

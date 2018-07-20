@@ -34,4 +34,19 @@ public class Utils {
         String time =df.format(new Date());
         return time;
     }
+
+    public static String getPositionDescription(String s){
+        String[] arry= s.split(",");
+        return arry[0];
+    }
+    public static double getLatitude(String s){
+        //获取纬度信息
+        String[] arry= s.split(",");
+        return Double.valueOf(arry[1]);
+    }
+    public static double getLongitude(String s){
+        //获取经度信息
+        String[] arry= s.split(",");
+        return Double.valueOf(arry[2]);
+    }
 }
