@@ -7,11 +7,11 @@
     <item
         android:id="@+id/myGroup"
         android:icon="@mipmap/group"
-        android:title="    我创建的群组" />
+        android:title="    我的群组" />
     <item
-        android:id="@+id/joinedGroup"
+        android:id="@+id/joinGroup"
         android:icon="@mipmap/joinedgroup"
-        android:title="    已加入群组" />
+        android:title="    加入群组" />
     <item
         android:id="@+id/quit"
         android:icon="@mipmap/quit"

@@ -10,6 +10,7 @@ public class User extends BmobObject{
     private String password;
     private boolean isAdmin;
     private List<String> checkInList;
+    private List<String> groupList;
 
     public User() {
     }
@@ -20,6 +21,7 @@ public class User extends BmobObject{
         this.password = "";
         this.isAdmin = false;
         this.checkInList=null;
+        this.groupList=null;
     }
 
     public User(String username, String account, String password, boolean isAdmin) {
@@ -28,6 +30,7 @@ public class User extends BmobObject{
         this.password = password;
         this.isAdmin = isAdmin;
         this.checkInList=null;
+        this.groupList=null;
     }
 
     public String getUsername() {
@@ -68,5 +71,13 @@ public class User extends BmobObject{
 
     public void setCheckInList(List<String> checkInList) {
         this.checkInList = checkInList;
+    }
+
+    public List<String> getGroupList() {
+        return groupList;
+    }
+
+    public void setGroupList(List<String> groupList) {
+        this.groupList = groupList;
     }
 }

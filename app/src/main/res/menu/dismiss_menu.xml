@@ -2,8 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/add_group_checkin"
+        android:icon="@mipmap/add_group"
+        android:title="添加群组签到"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/dismiss"
         android:icon="@mipmap/dismiss"
-        android:title="dismiss"
-        app:showAsAction="always"/>
+        android:title="解散群组"
+        app:showAsAction="never"/>
 </menu>

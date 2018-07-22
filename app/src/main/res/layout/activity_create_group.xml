@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EAEAEA"
     android:orientation="vertical"
-    tools:context=".detail.GroupCreatedActivity">
+    tools:context=".group.CreateGroupActivity">
     <LinearLayout
         android:layout_margin="10dp"
         android:layout_width="match_parent"
@@ -17,7 +16,7 @@
             android:layout_margin="3dp"
             android:layout_width="120dp"
             android:layout_height="match_parent"
-            android:src="@drawable/group_created_icon" />
+            android:src="@drawable/add_check_icon" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -25,28 +24,20 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="4"
+                android:layout_weight="2"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
                 android:textColor="@android:color/black"
                 android:textSize="15sp"
-                android:text="群组详情"/>
-            <TextView
-                android:id="@+id/created_group_description"
+                android:text="群组名称"/>
+            <EditText
+                android:id="@+id/group_title"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="3"
+                android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
-                android:text="描述..."/>
-            <TextView
-                android:id="@+id/created_group_time"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:gravity="center_vertical"
-                android:paddingLeft="10dp"
-                android:text="创建时间:2018-01-17"/>
+                android:hint="输入名称"/>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -55,7 +46,6 @@
         android:layout_weight="1"
         android:orientation="vertical">
         <TextView
-            android:id="@+id/created_group_owner"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:paddingLeft="20dp"
@@ -64,23 +54,14 @@
             android:background="#FFFFFF"
             android:textSize="17sp"
             android:text="创建者: Dave"/>
-        <TextView
-            android:id="@+id/created_num"
+        <EditText
+            android:id="@+id/group_description"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="150dp"
             android:paddingLeft="20dp"
-            android:layout_marginBottom="5dp"
+            android:layout_margin="3dp"
             android:gravity="center_vertical"
-            android:text="签到: 17人"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="#FFFFFF">
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/created_recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
+            android:background="@drawable/input"
+            android:hint="输入描述..."/>
     </LinearLayout>
 </LinearLayout>

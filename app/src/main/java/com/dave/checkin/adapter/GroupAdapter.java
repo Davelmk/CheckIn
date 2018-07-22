@@ -34,8 +34,8 @@ public class GroupAdapter extends RecyclerView.Adapter <GroupAdapter.ViewHolder>
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.cardView.setCardBackgroundColor(mContext.getResources().getColor(list.get(position).getBackgroundColor()));
         holder.item_title.setText(list.get(position).getTitle());
-        holder.item_owner.setText(list.get(position).getOwner());
-        holder.item_num.setText(list.get(position).getNumOfMember()+"人");
+        holder.item_owner.setText(list.get(position).getOwnerName());
+        holder.item_num.setText(list.get(position).getNum()+"人");
     }
 
     @Override

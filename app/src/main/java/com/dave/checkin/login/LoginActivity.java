@@ -32,6 +32,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private ProgressBar progressBar;
 
     private String userID;
+    private String userName;
     private boolean isAdmin;
 
     @Override
@@ -77,6 +78,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putBoolean("isLogin",true);
         editor.putString("userID",userID);
+        editor.putString("userName",userName);
         editor.putString("account",login_account.getText().toString());
         editor.putString("password",login_password.getText().toString());
         editor.putBoolean("isAdmin",isAdmin);
@@ -94,6 +96,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Log.d("Login",list.get(0).getUsername());
                     Log.d("Login",list.get(0).getAccount());
                     userID=list.get(0).getObjectId();
+                    userName=list.get(0).getUsername();
                     isAdmin=list.get(0).isAdmin();
                     loginSuccess();
                 }else {

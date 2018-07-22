@@ -6,32 +6,38 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dave.checkin.R;
 import com.dave.checkin.adapter.GroupMemberAdapter;
+import com.dave.checkin.beans.Group;
 import com.dave.checkin.beans.User;
+import com.dave.checkin.group.AddGroupCheckinActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.UpdateListener;
 
 public class GroupCreatedActivity extends AppCompatActivity {
     private TextView created_group_description;
     private TextView created_group_time;
     private TextView created_group_owner;
-    private TextView created_group_position;
     private TextView created_num;
-    private ImageView img_group_position;
 
     //RecyclerView
     private RecyclerView recyclerView;
     private List<User> list;
     private GroupMemberAdapter adapter;
+
+    private String ownerId;
+    private String groupId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,15 +51,7 @@ public class GroupCreatedActivity extends AppCompatActivity {
         created_group_description=findViewById(R.id.created_group_description);
         created_group_time=findViewById(R.id.created_group_time);
         created_group_owner=findViewById(R.id.created_group_owner);
-        created_group_position=findViewById(R.id.created_group_position);
         created_num=findViewById(R.id.created_num);
-        img_group_position=findViewById(R.id.img_group_position);
-        img_group_position.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(GroupCreatedActivity.this,"群组定位",Toast.LENGTH_SHORT).show();
-            }
-        });
     }
     private void setComponents(){
         Intent i=getIntent();
@@ -64,8 +62,10 @@ public class GroupCreatedActivity extends AppCompatActivity {
         created_group_description.setText(i.getStringExtra("description"));
         created_group_time.setText("创建时间:"+i.getStringExtra("time"));
         created_group_owner.setText("创建者: "+i.getStringExtra("owner"));
-        created_group_position.setText(i.getStringExtra("position"));
         created_num.setText("签到: "+i.getStringExtra("num")+"人");
+
+        ownerId=i.getStringExtra("ownerId");
+        groupId=i.getStringExtra("id");
     }
 
     private void initList(){
@@ -92,8 +92,27 @@ public class GroupCreatedActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void removeMemberFromGroup(){
+    private void goToAddGroupCheckin(){
+        Intent intent=new Intent(GroupCreatedActivity.this, AddGroupCheckinActivity.class);
+        intent.putExtra("ownerId",ownerId);
+        intent.putExtra("groupId",groupId);
+        startActivity(intent);
+    }
 
+    private void dismissGroup(){
+        Group group=new Group();
+        group.setObjectId(groupId);
+        group.delete(new UpdateListener() {
+            @Override
+            public void done(BmobException e) {
+                if(e==null){
+                    Log.d("删除分组","删除成功");
+                    finish();
+                }else {
+                    Log.d("删除分组",e.getMessage());
+                }
+            }
+        });
     }
 
     @Override
@@ -108,9 +127,15 @@ public class GroupCreatedActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 break;
-            case R.id.search:
+            case R.id.dismiss:
                 Toast.makeText(GroupCreatedActivity.this, "解散群组",
                         Toast.LENGTH_SHORT).show();
+                dismissGroup();
+                break;
+            case R.id.add_group_checkin:
+                Toast.makeText(GroupCreatedActivity.this, "添加群组签到",
+                        Toast.LENGTH_SHORT).show();
+                goToAddGroupCheckin();
                 break;
             default:
                 break;

@@ -2,13 +2,13 @@ package com.dave.checkin.main;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,11 +23,11 @@ import android.widget.Toast;
 import com.dave.checkin.R;
 import com.dave.checkin.adapter.CheckInAdapter;
 import com.dave.checkin.beans.CheckIn;
+import com.dave.checkin.beans.Group;
 import com.dave.checkin.beans.User;
 import com.dave.checkin.detail.CheckDetailActivity;
 import com.dave.checkin.group.CreatedActivity;
 import com.dave.checkin.group.JoinedActivity;
-import com.dave.checkin.utils.CheckinDBHelper;
 import com.dave.checkin.utils.Utils;
 
 import java.util.ArrayList;
@@ -47,11 +47,13 @@ public class MainActivity extends AppCompatActivity {
     private List<CheckIn> checkInList;
     private CheckInAdapter adapter;
 
+    //Swipe_Refresh
+    private SwipeRefreshLayout refreshLayout;
+
     //FloatingActionButton
     private FloatingActionButton add_checkin;
 
-    //SQLite
-    private SQLiteDatabase db;
+    private String userid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,39 +68,57 @@ public class MainActivity extends AppCompatActivity {
         }
         drawerLayout=findViewById(R.id.drawer_layout);
         initNavigationView();
-        checkInList =new ArrayList<>();
+        checkInList = new ArrayList<>();
+        getUserId();
         initList();
-//        getCheckinFromDB();
-        getCheckinFromBmob();
-        add_checkin=findViewById(R.id.add_checkin);
+        //get数据
+        checkUserLevel();
+
+        //Swipe_Refresh
+        refreshLayout=findViewById(R.id.swipe_refresh);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout();
+            }
+        });
+        //功能未完成
+        add_checkin = findViewById(R.id.add_checkin);
         add_checkin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checckUserLevel1();
+                Toast.makeText(MainActivity.this, "功能暂不开放", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void checckUserLevel1(){
-        SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
-        boolean isAdmin=sharedPreferences.getBoolean("isAdmin",false);
-        if (isAdmin){
-            goToAddCheckIn();
-        }else {
-            Toast.makeText(MainActivity.this,"您不是管理员用户",Toast.LENGTH_SHORT).show();
+    private void refreshLayout(){
+        checkInList.clear();
+        checkUserLevel();
+    }
+
+    private void checkUserLevel() {
+        SharedPreferences sharedPreferences = getSharedPreferences("LoginState", MODE_PRIVATE);
+        boolean isAdmin = sharedPreferences.getBoolean("isAdmin", false);
+        if (isAdmin) {
+            Log.d("MainActivity","直接获取Bmob中的签到列表");
+            getCheckinFromBmob();
+        } else {
+            Toast.makeText(MainActivity.this, "您不是管理员用户", Toast.LENGTH_SHORT).show();
+            getGroupListFromBmob();
         }
     }
 
-    private void goToAddCheckIn(){
-        Intent intent=new Intent(MainActivity.this,AddCheckActivity.class);
+    private void goToAddCheckIn() {
+        Intent intent = new Intent(MainActivity.this, AddCheckActivity.class);
         startActivityForResult(intent, Utils.REQUEST_ADD_CHECKIN);
     }
 
-    private void initList(){
-        recyclerView=findViewById(R.id.main_recyclerView);
-        GridLayoutManager layoutManager=new GridLayoutManager(this,3);
+    private void initList() {
+        recyclerView = findViewById(R.id.main_recyclerView);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(layoutManager);
-        adapter=new CheckInAdapter(this, checkInList);
+        adapter = new CheckInAdapter(this, checkInList);
         adapter.setItemClickListener(new CheckInAdapter.MyItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -110,27 +130,25 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void goToCheckDetailActivity(int position){
-        Intent intent=new Intent(MainActivity.this,CheckDetailActivity.class);
-        intent.putExtra("id",checkInList.get(position).getId());
-        intent.putExtra("title",checkInList.get(position).getTitle());
+    private void goToCheckDetailActivity(int position) {
+        Intent intent = new Intent(MainActivity.this, CheckDetailActivity.class);
+        intent.putExtra("id", checkInList.get(position).getId());
+        intent.putExtra("title", checkInList.get(position).getTitle());
         startActivity(intent);
     }
 
 
-    private void getCheckinFromBmob(){
-        checkInList.clear();
-        SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
-        String userid=sharedPreferences.getString("userID","");
-
-        BmobQuery<User> query=new BmobQuery<>();
+    private void getGroupListFromBmob(){
+        BmobQuery<User> query = new BmobQuery<>();
         query.getObject(userid, new QueryListener<User>() {
             @Override
             public void done(User user, BmobException e) {
                 if (e == null) {
-                    List<String> checkinList = user.getCheckInList();
-                    Log.i("MainActivity", "初始化checkinList:" + checkinList.size());
-                    getCheckinDetail(checkinList);
+                    if (user.getGroupList()==null){
+                        Toast.makeText(MainActivity.this, "未参加任何群组", Toast.LENGTH_SHORT).show();
+                    }else {
+                        getGroupCheckin(user.getGroupList());
+                    }
                 } else {
                     Log.d("MainActivity", e.getMessage());
                 }
@@ -138,61 +156,92 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void getCheckinDetail(final List<String> checkin){
-        Log.d("MainActivity",checkin.toString());
-        BmobQuery<CheckIn> query=new BmobQuery<>();
+    private void getGroupCheckin(List<String> groupList){
+        BmobQuery<Group> query=new BmobQuery<>();
+        query.addWhereContainedIn("objectId",groupList);
+        query.findObjects(new FindListener<Group>() {
+            @Override
+            public void done(List<Group> list, BmobException e) {
+                if (e==null){
+                    List<String> checkList=new ArrayList<>();
+                    for (Group group:list){
+                        checkList.addAll(group.getCheckin());
+                    }
+                    getCheckinDetail(checkList);
+                }else {
+                    Log.d("getGroupCheckin", e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void getCheckinFromBmob() {
+        checkInList.clear();
+
+        BmobQuery<Group> query = new BmobQuery<>();
+        query.addWhereEqualTo("owner",userid);
+        query.findObjects(new FindListener<Group>() {
+            @Override
+            public void done(List<Group> list, BmobException e) {
+                if (e==null){
+                    List<String> checkList=new ArrayList<>();
+                    for (Group group:list){
+                        checkList.addAll(group.getCheckin());
+                    }
+                    getCheckinDetail(checkList);
+                }else {
+                    Log.d("getGroupCheckin", e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void getUserId(){
+        SharedPreferences sharedPreferences = getSharedPreferences("LoginState", MODE_PRIVATE);
+        userid = sharedPreferences.getString("userID", "");
+    }
+
+    private void getCheckinDetail(final List<String> checkin) {
+        Log.d("MainActivity", checkin.toString());
+        BmobQuery<CheckIn> query = new BmobQuery<>();
         query.addWhereContainedIn("objectId", checkin);
         query.findObjects(new FindListener<CheckIn>() {
             @Override
             public void done(List<CheckIn> list, BmobException e) {
-                if (e==null){
+                if (e == null) {
                     refreshList(list);
-                }
-                else {
-                    Log.d("Main",e.getMessage());
+                } else {
+                    Log.d("Main", e.getMessage());
                 }
             }
         });
 
     }
-    private void refreshList(List<CheckIn> list){
-        CheckIn temp=null;
-        for (CheckIn checkIn:list){
-            temp=new CheckIn(checkIn.getTitle(),checkIn.getOwner(),checkIn.getNum());
+
+    private void refreshList(List<CheckIn> list) {
+        CheckIn temp = null;
+        for (CheckIn checkIn : list) {
+            temp = new CheckIn(checkIn.getTitle(), checkIn.getOwner(), checkIn.getNum(),checkIn.getOwnerName());
             temp.setId(checkIn.getObjectId());
             temp.setTime(checkIn.getCreatedAt());
             checkInList.add(temp);
         }
         adapter.notifyDataSetChanged();
+        refreshLayout.setRefreshing(false);
     }
 
-    private void getCheckinFromDB(){
-        CheckinDBHelper dbHelper=new CheckinDBHelper(this,"CheckIn.db", null, 1);
-        db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query("checkin", null, null,
-                null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String title = cursor.getString(cursor.getColumnIndex("title"));
-                String owner = cursor.getString(cursor.getColumnIndex("owner"));
-                String num = cursor.getString(cursor.getColumnIndex("num"));
-                checkInList.add(new CheckIn(title,owner,num));
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        initList();
-    }
 
-    private void goToJoinedGroup(){
-        Intent intent=new Intent(MainActivity.this, JoinedActivity.class);
-        startActivity(intent);
-    }
-    private void goToCreatedGroup(){
-        Intent intent=new Intent(MainActivity.this, CreatedActivity.class);
+    private void goToJoinGroup() {
+        Intent intent = new Intent(MainActivity.this, JoinedActivity.class);
         startActivity(intent);
     }
 
-    private void initNavigationView(){
+    private void goToCreatedGroup() {
+        Intent intent = new Intent(MainActivity.this, CreatedActivity.class);
+        startActivity(intent);
+    }
+
+    private void initNavigationView() {
         navigationView = findViewById(R.id.navigation);
         navigationView.setNavigationItemSelectedListener(new NavigationView.
                 OnNavigationItemSelectedListener() {
@@ -208,10 +257,10 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show();
                         goToCreatedGroup();
                         break;
-                    case R.id.joinedGroup:
+                    case R.id.joinGroup:
                         Toast.makeText(MainActivity.this, item.getTitle(),
                                 Toast.LENGTH_SHORT).show();
-                        checckUserLevel2();
+                        goToJoinGroup();
                         break;
                     case R.id.quit:
                         Toast.makeText(MainActivity.this, item.getTitle(),
@@ -227,67 +276,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void checckUserLevel2(){
-        SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
-        boolean isAdmin=sharedPreferences.getBoolean("isAdmin",false);
-        if (isAdmin){
-            Toast.makeText(MainActivity.this,"您是管理员用户",Toast.LENGTH_SHORT).show();
-        }else {
-            goToJoinedGroup();
-        }
-    }
-    private void drawerOption(){
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+
+    private void drawerOption() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        }else {
+        } else {
             drawerLayout.openDrawer(GravityCompat.START);
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode==Utils.REQUEST_ADD_CHECKIN&&resultCode==Utils.RESULT_ADD_CHECKIN){
-            Log.d("MainActivity","成功添加签到活动");
-            String objectId=data.getStringExtra("objectId");
-            Log.d("MainActivity",objectId);
+        if (requestCode == Utils.REQUEST_ADD_CHECKIN && resultCode == Utils.RESULT_ADD_CHECKIN) {
+            Log.d("MainActivity", "成功添加签到活动");
+            String objectId = data.getStringExtra("objectId");
+            Log.d("MainActivity", objectId);
             addCheckinToListFromBmob(objectId);
         }
     }
 
-    private void addCheckinToListFromBmob(String objectId){
-        BmobQuery<CheckIn> query=new BmobQuery<>();
+    private void addCheckinToListFromBmob(String objectId) {
+        BmobQuery<CheckIn> query = new BmobQuery<>();
         query.getObject(objectId, new QueryListener<CheckIn>() {
             @Override
             public void done(CheckIn checkIn, BmobException e) {
-                if(e==null){
-                    Log.e("MainActivity",checkIn.getTitle()+","+checkIn.getOwner());
-                    CheckIn temp=new CheckIn(checkIn.getTitle(),checkIn.getOwner(),checkIn.getNum());
+                if (e == null) {
+                    Log.e("MainActivity", checkIn.getTitle() + "," + checkIn.getOwner());
+                    CheckIn temp = new CheckIn(checkIn.getTitle(), checkIn.getOwner(), checkIn.getNum(),checkIn.getOwnerName());
                     temp.setId(checkIn.getObjectId());
                     temp.setTime(checkIn.getCreatedAt());
                     checkInList.add(temp);
-                    Log.e("MainActivity", checkInList.size()+"");
+                    Log.e("MainActivity", checkInList.size() + "");
                     adapter.notifyDataSetChanged();
-                }else {
-                    Log.e("MainActivity","失败："+e.getMessage()+","+e.getErrorCode());
+                } else {
+                    Log.e("MainActivity", "失败：" + e.getMessage() + "," + e.getErrorCode());
                 }
             }
         });
-    }
-
-    private void addCheckinToListFromDB(String objectId){
-        CheckinDBHelper dbHelper=new CheckinDBHelper(this,"CheckIn.db", null, 1);
-        db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query("checkin", null, "id="+objectId,
-                null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String title = cursor.getString(cursor.getColumnIndex("title"));
-                String owner = cursor.getString(cursor.getColumnIndex("owner"));
-                String num = cursor.getString(cursor.getColumnIndex("num"));
-                checkInList.add(0,new CheckIn(title,owner,num));
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
     }
 
 

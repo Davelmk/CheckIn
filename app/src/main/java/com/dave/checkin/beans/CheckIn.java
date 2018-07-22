@@ -7,12 +7,16 @@ import cn.bmob.v3.BmobObject;
 public class CheckIn extends BmobObject{
     private String title;
     private String owner;
+    private String ownerName;
     private String description;
     private String position;
     private String num;
     private transient String time;
     private transient String id;
     private transient int backgroundColor;
+
+    public CheckIn() {
+    }
 
     public CheckIn(String title, String owner) {
         this.title = title;
@@ -24,14 +28,23 @@ public class CheckIn extends BmobObject{
         this.backgroundColor = Utils.getColor();
     }
 
-    public CheckIn(String title, String owner, String num) {
+    public CheckIn(String title, String owner, String num,String ownerName) {
         this.title = title;
         this.owner = owner;
+        this.ownerName = ownerName;
         this.num = num;
         this.time = "暂无时间";
         this.position = "暂无定位";
         this.description = "暂无描述";
         this.backgroundColor = Utils.getColor();
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public String getId() {

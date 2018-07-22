@@ -36,12 +36,13 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="RgiBiBfzoHdoLdg4DjuMElO23pAF8Fz0" >
-        </meta-data>
+            android:value="RgiBiBfzoHdoLdg4DjuMElO23pAF8Fz0" />
+
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote" />
+
         <activity android:name=".login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,7 +59,7 @@
             android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".map.PositionActivity"
-            android:parentActivityName=".detail.CheckDetailActivity"/>
+            android:parentActivityName=".detail.CheckDetailActivity" />
         <activity
             android:name=".map.SignActivity"
             android:parentActivityName=".detail.CheckDetailActivity" />
@@ -77,8 +78,14 @@
         <activity
             android:name=".detail.GroupCreatedActivity"
             android:parentActivityName=".group.CreatedActivity" />
-        <activity android:name=".main.AddCheckActivity"
-            android:parentActivityName=".main.MainActivity"/>
+        <activity
+            android:name=".main.AddCheckActivity"
+            android:parentActivityName=".main.MainActivity" />
+        <activity
+            android:name=".group.CreateGroupActivity"
+            android:parentActivityName=".group.CreatedActivity" />
+        <activity android:name=".group.AddGroupCheckinActivity"
+            android:parentActivityName=".detail.GroupCreatedActivity"/>
     </application>
 
 </manifest>

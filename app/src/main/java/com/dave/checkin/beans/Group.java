@@ -1,33 +1,43 @@
 package com.dave.checkin.beans;
 
+import com.dave.checkin.utils.Utils;
+
 import java.util.List;
 
-public class Group {
+import cn.bmob.v3.BmobObject;
+
+public class Group extends BmobObject{
     private String title;
     private String owner;
-    private String time;
+    private String num;
     private String description;
-    private int numOfMember;
-    private List list;
-    private int backgroundColor;
+    private List<String> member;
+    private List<String> checkin;
+    private transient String ownerName;
+    private transient String time;
+    private transient String id;
+    private transient int backgroundColor;
 
-    public Group(String title, String owner, int backgroundColor) {
-        this.title = title;
-        this.owner = owner;
-        this.backgroundColor = backgroundColor;
-        this.time="";
-        this.numOfMember=0;
-        this.list=null;
+    public Group() {
     }
 
-    public Group(String title, String owner, String time, String description, int numOfMember, List list, int backgroundColor) {
+    public Group(String title, String owner) {
         this.title = title;
         this.owner = owner;
-        this.time = time;
-        this.description = description;
-        this.numOfMember = numOfMember;
-        this.list = list;
-        this.backgroundColor = backgroundColor;
+        this.ownerName = "Dave";
+        this.num=0+"";
+        this.description="暂无描述";
+        this.member=null;
+        this.checkin=null;
+        this.backgroundColor=Utils.getColor();
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public String getTitle() {
@@ -46,12 +56,12 @@ public class Group {
         this.owner = owner;
     }
 
-    public String getTime() {
-        return time;
+    public String getNum() {
+        return num;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setNum(String num) {
+        this.num = num;
     }
 
     public String getDescription() {
@@ -62,20 +72,36 @@ public class Group {
         this.description = description;
     }
 
-    public int getNumOfMember() {
-        return numOfMember;
+    public List<String> getMember() {
+        return member;
     }
 
-    public void setNumOfMember(int numOfMember) {
-        this.numOfMember = numOfMember;
+    public void setMember(List<String> member) {
+        this.member = member;
     }
 
-    public List getList() {
-        return list;
+    public List<String> getCheckin() {
+        return checkin;
     }
 
-    public void setList(List list) {
-        this.list = list;
+    public void setCheckin(List<String> checkin) {
+        this.checkin = checkin;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public int getBackgroundColor() {

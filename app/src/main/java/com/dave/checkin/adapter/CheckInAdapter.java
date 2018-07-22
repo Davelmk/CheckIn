@@ -34,7 +34,7 @@ public class CheckInAdapter extends RecyclerView.Adapter <CheckInAdapter.ViewHol
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.cardView.setCardBackgroundColor(mContext.getResources().getColor(list.get(position).getBackgroundColor()));
         holder.item_title.setText(list.get(position).getTitle());
-        holder.item_owner.setText(list.get(position).getOwner());
+        holder.item_owner.setText(list.get(position).getOwnerName());
         holder.item_num.setText(list.get(position).getNum()+"人");
         holder.item_time.setText(list.get(position).getTime());
     }

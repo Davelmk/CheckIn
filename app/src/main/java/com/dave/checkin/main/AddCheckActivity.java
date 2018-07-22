@@ -64,6 +64,7 @@ public class AddCheckActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("AddCheckActivity","获取定位信息");
+                isFirstLoc=true;
                 getPosition();
             }
         });
@@ -103,7 +104,7 @@ public class AddCheckActivity extends AppCompatActivity {
             @Override
             public void done(String s, BmobException e) {
                 if(e==null){
-                    //获取Checin的ID
+                    //获取CheckIn的ID
                     checkIn.setId(s);
                     //写入数据库
                     writeToDB();
@@ -119,7 +120,7 @@ public class AddCheckActivity extends AppCompatActivity {
          * 目标更改：
          * 合并User-Checkin到User表，则可以根据UserID直接更新用户的签到列表
          */
-        List<String> checkinList=getListFromDB();
+        List<String> checkinList=getListFromBmob();
         //获取User的ID
         SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
         String userid=sharedPreferences.getString("userID","");
@@ -141,7 +142,15 @@ public class AddCheckActivity extends AppCompatActivity {
         });
     }
 
-    private List<String> getListFromDB(){
+    /**
+     * 待定：
+     * 主界面的添加按钮->为owner的所有群组添加同样的签到活动
+     */
+    private void updateGroupCheckin(){
+
+    }
+
+    private List<String> getListFromBmob(){
         List<String> checkinList=new ArrayList<>();
         CheckinDBHelper dbHelper=new CheckinDBHelper(this,"CheckIn.db", null, 1);
         db = dbHelper.getReadableDatabase();
@@ -219,6 +228,7 @@ public class AddCheckActivity extends AppCompatActivity {
                 String description=location.getLocationDescribe();
                 position_description.setText(description);
                 position=description+","+latitude+","+longitude;
+                isFirstLoc=false;
             }else {
                 locationClient.stop();
             }

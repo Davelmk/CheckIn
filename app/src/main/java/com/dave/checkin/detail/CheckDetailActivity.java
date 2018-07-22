@@ -34,6 +34,7 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     private TextView detail_description;
 
     private String checkin_id;
+    private String num;
     private String position;
 
     @Override
@@ -81,7 +82,8 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
                     position= checkIn.getPosition();
                     Log.d("position",position);
                     Log.d("position",Utils.getPositionDescription(position));
-                    setComponents(checkIn.getOwner(),checkIn.getNum(),
+                    num= checkIn.getNum();
+                    setComponents(checkIn.getOwnerName(),num,
                             checkIn.getDescription(),Utils.getPositionDescription(position),checkIn.getCreatedAt());
                 } else {
                     Log.d("MainActivity", e.getMessage());
@@ -131,12 +133,27 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     }
     private void goToCheckSign(){
         Intent intent=new Intent(CheckDetailActivity.this, SignActivity.class);
-        startActivity(intent);
+        intent.putExtra("checkId",checkin_id);
+        intent.putExtra("num",num);
+        startActivityForResult(intent,Utils.REQUEST_SIGN);
     }
     private void goToTopicActivity(){
         Intent intent=new Intent(CheckDetailActivity.this, TopicActivity.class);
         startActivity(intent);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Utils.REQUEST_SIGN && resultCode == Utils.RESULT_SIGN) {
+            Log.d("MainActivity", "成功添加签到");
+            updateTextView();
+        }
+    }
+    private void updateTextView(){
+        int s=Integer.valueOf(num)+1;
+        detail_num.setText("已签到: "+s+"人");
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
