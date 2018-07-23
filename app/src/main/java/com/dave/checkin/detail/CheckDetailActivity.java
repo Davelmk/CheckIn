@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,14 +16,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dave.checkin.R;
+import com.dave.checkin.adapter.SignMemberAdapter;
 import com.dave.checkin.beans.CheckIn;
+import com.dave.checkin.beans.User;
 import com.dave.checkin.map.PositionActivity;
 import com.dave.checkin.map.SignActivity;
 import com.dave.checkin.topic.TopicActivity;
 import com.dave.checkin.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
 
 public class CheckDetailActivity extends AppCompatActivity implements View.OnClickListener{
@@ -36,6 +44,11 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
     private String checkin_id;
     private String num;
     private String position;
+
+    private RecyclerView recyclerView;
+    private List<User> users;
+    private List<String> userList;
+    private SignMemberAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +76,14 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
         detail_description=findViewById(R.id.detail_description);
         detail_createdDate=findViewById(R.id.detail_createdDate);
         position_description=findViewById(R.id.position_description);
+
+        //recyclerView
+        users=new ArrayList<User>();
+        recyclerView=findViewById(R.id.sign_recyclerView);
+        LinearLayoutManager layoutManager=new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter=new SignMemberAdapter(users);
+        recyclerView.setAdapter(adapter);
     }
 
     private void setComponents(String owner,String num,String description,String position,String createdDate){
@@ -83,13 +104,35 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
                     Log.d("position",position);
                     Log.d("position",Utils.getPositionDescription(position));
                     num= checkIn.getNum();
+                    userList=checkIn.getSignList();
                     setComponents(checkIn.getOwnerName(),num,
                             checkIn.getDescription(),Utils.getPositionDescription(position),checkIn.getCreatedAt());
+                    getSignMember(userList);
                 } else {
                     Log.d("MainActivity", e.getMessage());
                 }
             }
         });
+    }
+
+    private void getSignMember(List<String> idList){
+        if (idList==null){
+            Log.d("获取签到人员","无人签到");
+        }else {
+            BmobQuery<User> query=new BmobQuery<>();
+            query.addWhereContainedIn("objectId",idList);
+            query.findObjects(new FindListener<User>() {
+                @Override
+                public void done(List<User> list, BmobException e) {
+                    if (e==null){
+                        users=list;
+                        adapter.notifyDataSetChanged();
+                    }else {
+                        Log.d("获取签到人员","查询错误:"+e.getMessage());
+                    }
+                }
+            });
+        }
     }
 
 
@@ -147,8 +190,17 @@ public class CheckDetailActivity extends AppCompatActivity implements View.OnCli
         if (requestCode == Utils.REQUEST_SIGN && resultCode == Utils.RESULT_SIGN) {
             Log.d("MainActivity", "成功添加签到");
             updateTextView();
+            updateRecyclerView();
         }
     }
+
+    private void updateRecyclerView(){
+        SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
+        String username=sharedPreferences.getString("userName","Dave");
+        users.add(0,new User(username));
+        adapter.notifyDataSetChanged();
+    }
+
     private void updateTextView(){
         int s=Integer.valueOf(num)+1;
         detail_num.setText("已签到: "+s+"人");

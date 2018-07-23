@@ -132,6 +132,16 @@ public class CreatedActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
+    private void checkUserLevel() {
+        SharedPreferences sharedPreferences = getSharedPreferences("LoginState", MODE_PRIVATE);
+        boolean isAdmin = sharedPreferences.getBoolean("isAdmin", false);
+        if (isAdmin) {
+            goToCreateGroup();
+        } else {
+            Toast.makeText(CreatedActivity.this, "您不是管理员用户", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("Group",requestCode+","+resultCode);
@@ -152,7 +162,7 @@ public class CreatedActivity extends AppCompatActivity {
             case R.id.add_group:
                 Toast.makeText(CreatedActivity.this, "添加群组",
                         Toast.LENGTH_SHORT).show();
-                goToCreateGroup();
+                checkUserLevel();
                 break;
             default:
                 break;

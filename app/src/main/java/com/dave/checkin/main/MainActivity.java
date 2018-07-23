@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dave.checkin.R;
@@ -28,6 +29,7 @@ import com.dave.checkin.beans.User;
 import com.dave.checkin.detail.CheckDetailActivity;
 import com.dave.checkin.group.CreatedActivity;
 import com.dave.checkin.group.JoinedActivity;
+import com.dave.checkin.login.LoginActivity;
 import com.dave.checkin.utils.Utils;
 
 import java.util.ArrayList;
@@ -42,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     //抽屉布局
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private TextView user_name;
+
     //RecyclerView
     private RecyclerView recyclerView;
     private List<CheckIn> checkInList;
@@ -68,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
         }
         drawerLayout=findViewById(R.id.drawer_layout);
         initNavigationView();
+        //设置当前登录用户
+        setUser_name();
+
         checkInList = new ArrayList<>();
         getUserId();
         initList();
@@ -90,6 +97,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "功能暂不开放", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void setUser_name(){
+        SharedPreferences sharedPreferences = getSharedPreferences("LoginState", MODE_PRIVATE);
+        View view=navigationView.getHeaderView(0);
+        user_name=view.findViewById(R.id.user_name);
+        user_name.setText(sharedPreferences.getString("userName","Dave"));
     }
 
     private void refreshLayout(){
@@ -241,6 +255,17 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void quitApplication(){
+        SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putBoolean("isLogin",false);
+        editor.commit();
+        Intent intent=getPackageManager().getLaunchIntentForPackage(getPackageName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+
     private void initNavigationView() {
         navigationView = findViewById(R.id.navigation);
         navigationView.setNavigationItemSelectedListener(new NavigationView.
@@ -265,6 +290,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.quit:
                         Toast.makeText(MainActivity.this, item.getTitle(),
                                 Toast.LENGTH_SHORT).show();
+                        quitApplication();
                         break;
                     default:
                         Toast.makeText(MainActivity.this, "未知menu",

@@ -2,6 +2,8 @@ package com.dave.checkin.beans;
 
 import com.dave.checkin.utils.Utils;
 
+import java.util.List;
+
 import cn.bmob.v3.BmobObject;
 
 public class CheckIn extends BmobObject{
@@ -11,6 +13,7 @@ public class CheckIn extends BmobObject{
     private String description;
     private String position;
     private String num;
+    private List<String> signList;
     private transient String time;
     private transient String id;
     private transient int backgroundColor;
@@ -26,6 +29,7 @@ public class CheckIn extends BmobObject{
         this.num = 0 + "";
         this.description = "暂无描述";
         this.backgroundColor = Utils.getColor();
+        this.signList=null;
     }
 
     public CheckIn(String title, String owner, String num,String ownerName) {
@@ -37,6 +41,7 @@ public class CheckIn extends BmobObject{
         this.position = "暂无定位";
         this.description = "暂无描述";
         this.backgroundColor = Utils.getColor();
+        this.signList=null;
     }
 
     public String getOwnerName() {
@@ -109,5 +114,13 @@ public class CheckIn extends BmobObject{
 
     public void setBackgroundColor(int backgroundColor) {
         this.backgroundColor = backgroundColor;
+    }
+
+    public List<String> getSignList() {
+        return signList;
+    }
+
+    public void setSignList(List<String> signList) {
+        this.signList = signList;
     }
 }

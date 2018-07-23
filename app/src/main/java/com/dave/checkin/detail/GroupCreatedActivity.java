@@ -22,7 +22,10 @@ import com.dave.checkin.group.AddGroupCheckinActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 public class GroupCreatedActivity extends AppCompatActivity {
@@ -33,7 +36,7 @@ public class GroupCreatedActivity extends AppCompatActivity {
 
     //RecyclerView
     private RecyclerView recyclerView;
-    private List<User> list;
+    private List<User> userList;
     private GroupMemberAdapter adapter;
 
     private String ownerId;
@@ -45,6 +48,7 @@ public class GroupCreatedActivity extends AppCompatActivity {
         initComponents();
         setComponents();
         initList();
+//        getGroupMemberID();
     }
 
     private void initComponents(){
@@ -62,35 +66,69 @@ public class GroupCreatedActivity extends AppCompatActivity {
         created_group_description.setText(i.getStringExtra("description"));
         created_group_time.setText("创建时间:"+i.getStringExtra("time"));
         created_group_owner.setText("创建者: "+i.getStringExtra("owner"));
-        created_num.setText("签到: "+i.getStringExtra("num")+"人");
+        created_num.setText("群组成员: : "+i.getStringExtra("num")+"人");
 
         ownerId=i.getStringExtra("ownerId");
         groupId=i.getStringExtra("id");
     }
 
     private void initList(){
-        list=new ArrayList<>();
+        userList =new ArrayList<>();
         //临时数据
-        list.add(new User("dave"));
-        list.add(new User("tom"));
-        list.add(new User("mark"));
-        list.add(new User("jeff"));
-        list.add(new User("lili"));
-        list.add(new User("david"));
-        list.add(new User("marry"));
+        userList.add(new User("dave"));
+        userList.add(new User("tom"));
+        userList.add(new User("mark"));
+        userList.add(new User("jeff"));
+        userList.add(new User("lili"));
+        userList.add(new User("david"));
+        userList.add(new User("marry"));
         recyclerView=findViewById(R.id.created_recyclerView);
         GridLayoutManager layoutManager=new GridLayoutManager(this,5);
         recyclerView.setLayoutManager(layoutManager);
-        adapter=new GroupMemberAdapter(this,list);
+        adapter=new GroupMemberAdapter(this, userList);
         adapter.setItemClickListener(new GroupMemberAdapter.MyItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(GroupCreatedActivity.this, list.get(position).getUsername(),
+                Toast.makeText(GroupCreatedActivity.this, userList.get(position).getUsername(),
                         Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView.setAdapter(adapter);
     }
+
+//    private void getGroupMemberID(){
+//        BmobQuery<Group> query=new BmobQuery<>();
+//        query.getObject(groupId,new QueryListener<Group>() {
+//            @Override
+//            public void done(Group group, BmobException e) {
+//                if (e==null){
+//                    getMember(group.getMember());
+//                }else {
+//                    Log.d("查询成员","失败："+e.getMessage());
+//                }
+//            }
+//        });
+//    }
+
+//    private void getMember(final List<String> userIds){
+//        if (userIds==null){
+//            Log.d("查询群组成员","群组无成员");
+//        }else {
+//            BmobQuery<User> query=new BmobQuery<>();
+//            query.addWhereContainedIn("objectId",userIds);
+//            query.findObjects(new FindListener<User>() {
+//                @Override
+//                public void done(List<User> list, BmobException e) {
+//                    if (e==null){
+//                        userList=list;
+//                        adapter.notifyDataSetChanged();
+//                    }else {
+//                        Log.d("查询群组成员","查询失败"+e.getMessage());
+//                    }
+//                }
+//            });
+//        }
+//    }
 
     private void goToAddGroupCheckin(){
         Intent intent=new Intent(GroupCreatedActivity.this, AddGroupCheckinActivity.class);

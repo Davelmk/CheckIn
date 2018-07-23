@@ -11,12 +11,12 @@
     <LinearLayout
         android:layout_margin="10dp"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="100dp"
         android:orientation="horizontal"
         android:background="#FFFFFF">
         <ImageView
             android:layout_margin="3dp"
-            android:layout_width="120dp"
+            android:layout_width="100dp"
             android:layout_height="match_parent"
             android:src="@drawable/activity_icon" />
         <LinearLayout
@@ -36,7 +36,7 @@
                 android:id="@+id/detail_num"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
                 android:text="已签到: 0人"/>
@@ -44,7 +44,7 @@
                 android:id="@+id/detail_createdDate"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
                 android:text="创建时间: 2018-01-17"/>
@@ -58,7 +58,7 @@
         <TextView
             android:id="@+id/detail_owner"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:paddingLeft="20dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
@@ -67,7 +67,7 @@
             android:text="创建者: Dave"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:background="#FFFFFF"
             android:orientation="horizontal"
             android:layout_marginBottom="5dp">
@@ -104,7 +104,7 @@
         <TextView
             android:id="@+id/detail_topic"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:paddingLeft="20dp"
             android:layout_marginBottom="5dp"
             android:gravity="center_vertical"
@@ -114,11 +114,16 @@
         <TextView
             android:id="@+id/detail_description"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="100dp"
             android:paddingLeft="20dp"
             android:layout_margin="3dp"
             android:gravity="center_vertical"
             android:background="@drawable/input"
             android:hint="描述..."/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/sign_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
     </LinearLayout>
 </LinearLayout>

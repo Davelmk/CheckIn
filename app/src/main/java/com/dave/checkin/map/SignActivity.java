@@ -1,6 +1,7 @@
 package com.dave.checkin.map;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,7 +26,12 @@ import com.dave.checkin.beans.CheckIn;
 import com.dave.checkin.beans.User;
 import com.dave.checkin.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 public class SignActivity extends AppCompatActivity {
@@ -36,6 +42,11 @@ public class SignActivity extends AppCompatActivity {
     private boolean isFirstLoc = true;
     private LocationClient locationClient;
     private MyLocationListener locationListener;
+
+    private String userId;
+    private String num;
+    private String checkId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,10 +88,32 @@ public class SignActivity extends AppCompatActivity {
 
     private void confirmCheckIn(){
         Intent intent=getIntent();
-        String checkId=intent.getStringExtra("checkId");
-        String num=intent.getStringExtra("num");
+        checkId=intent.getStringExtra("checkId");
+        num=intent.getStringExtra("num");
+
+        SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
+        userId=sharedPreferences.getString("userID","id");
+
+        BmobQuery<CheckIn> query=new BmobQuery<>();
+        query.getObject(checkId, new QueryListener<CheckIn>() {
+            @Override
+            public void done(CheckIn checkIn, BmobException e) {
+                updateCheckin(checkIn.getSignList());
+            }
+        });
+    }
+
+    private void updateCheckin(List<String> list){
         CheckIn checkIn=new CheckIn();
         checkIn.setNum(Integer.valueOf(num)+1+"");
+        if (list==null){
+            List<String> stringList=new ArrayList<>();
+            stringList.add(userId);
+            checkIn.setSignList(stringList);
+        }else {
+            list.add(userId);
+            checkIn.setSignList(list);
+        }
         checkIn.update(checkId,new UpdateListener() {
             @Override
             public void done(BmobException e) {
@@ -92,6 +125,7 @@ public class SignActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void resultForSign(){
         setResult(Utils.RESULT_SIGN);
