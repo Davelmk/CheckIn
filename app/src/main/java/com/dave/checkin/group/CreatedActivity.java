@@ -94,12 +94,11 @@ public class CreatedActivity extends AppCompatActivity {
         Group group= groupList.get(pos);
         intent.putExtra("id",group.getId());
         intent.putExtra("title",group.getTitle());
-        intent.putExtra("ownerId",group.getOwner());
         intent.putExtra("owner",ownerName);
         intent.putExtra("num",group.getNum());
         intent.putExtra("time",group.getTime());
         intent.putExtra("description",group.getDescription());
-        startActivity(intent);
+        startActivityForResult(intent,Utils.REQUEST_DETAIL_GROUP);
     }
     private void goToCreateGroup(){
         Intent intent=new Intent(CreatedActivity.this,CreateGroupActivity.class);
@@ -141,15 +140,26 @@ public class CreatedActivity extends AppCompatActivity {
             Toast.makeText(CreatedActivity.this, "您不是管理员用户", Toast.LENGTH_SHORT).show();
         }
     }
+    private void removeGroupFromList(String groupId){
+        for (Group group:groupList){
+            if (groupId.equals(group.getId())){
+                groupList.remove(group);
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("Group",requestCode+","+resultCode);
+        Log.d("群组列表主页面",requestCode+","+resultCode);
         if (requestCode==Utils.REQUEST_ADD_GROUP&&resultCode==Utils.RESULT_ADD_GROUP){
             Log.d("Group","成功添加群组");
             String groupId=data.getStringExtra("groupId");
-            Log.d("Group",groupId);
             addGroupToListFromBmob(groupId);
+        }
+        if (resultCode==Utils.RESULT_DISMISS_GROUP){
+            Log.d("Group","已经解散群组");
+            removeGroupFromList(data.getStringExtra("groupId"));
         }
     }
 

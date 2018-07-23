@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.mipmap.menu);
         }
-        drawerLayout=findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
         initNavigationView();
         //设置当前登录用户
         setUser_name();
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         checkUserLevel();
 
         //Swipe_Refresh
-        refreshLayout=findViewById(R.id.swipe_refresh);
+        refreshLayout = findViewById(R.id.swipe_refresh);
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -99,14 +99,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setUser_name(){
+    private void setUser_name() {
         SharedPreferences sharedPreferences = getSharedPreferences("LoginState", MODE_PRIVATE);
-        View view=navigationView.getHeaderView(0);
-        user_name=view.findViewById(R.id.user_name);
-        user_name.setText(sharedPreferences.getString("userName","Dave"));
+        View view = navigationView.getHeaderView(0);
+        user_name = view.findViewById(R.id.user_name);
+        user_name.setText(sharedPreferences.getString("userName", "Dave"));
     }
 
-    private void refreshLayout(){
+    private void refreshLayout() {
         checkInList.clear();
         checkUserLevel();
     }
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("LoginState", MODE_PRIVATE);
         boolean isAdmin = sharedPreferences.getBoolean("isAdmin", false);
         if (isAdmin) {
-            Log.d("MainActivity","直接获取Bmob中的签到列表");
+            Log.d("MainActivity", "直接获取Bmob中的签到列表");
             getCheckinFromBmob();
         } else {
             Toast.makeText(MainActivity.this, "您不是管理员用户", Toast.LENGTH_SHORT).show();
@@ -152,15 +152,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void getGroupListFromBmob(){
+    private void getGroupListFromBmob() {
         BmobQuery<User> query = new BmobQuery<>();
         query.getObject(userid, new QueryListener<User>() {
             @Override
             public void done(User user, BmobException e) {
                 if (e == null) {
-                    if (user.getGroupList()==null){
+                    if (user.getGroupList() == null) {
                         Toast.makeText(MainActivity.this, "未参加任何群组", Toast.LENGTH_SHORT).show();
-                    }else {
+                        refreshLayout.setRefreshing(false);
+                    } else {
                         getGroupCheckin(user.getGroupList());
                     }
                 } else {
@@ -170,19 +171,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void getGroupCheckin(List<String> groupList){
-        BmobQuery<Group> query=new BmobQuery<>();
-        query.addWhereContainedIn("objectId",groupList);
+    private void getGroupCheckin(List<String> groupList) {
+        BmobQuery<Group> query = new BmobQuery<>();
+        query.addWhereContainedIn("objectId", groupList);
         query.findObjects(new FindListener<Group>() {
             @Override
             public void done(List<Group> list, BmobException e) {
-                if (e==null){
-                    List<String> checkList=new ArrayList<>();
-                    for (Group group:list){
+                if (e == null) {
+                    List<String> checkList = new ArrayList<>();
+                    for (Group group : list) {
                         checkList.addAll(group.getCheckin());
                     }
                     getCheckinDetail(checkList);
-                }else {
+                } else {
                     Log.d("getGroupCheckin", e.getMessage());
                 }
             }
@@ -193,49 +194,52 @@ public class MainActivity extends AppCompatActivity {
         checkInList.clear();
 
         BmobQuery<Group> query = new BmobQuery<>();
-        query.addWhereEqualTo("owner",userid);
+        query.addWhereEqualTo("owner", userid);
         query.findObjects(new FindListener<Group>() {
             @Override
             public void done(List<Group> list, BmobException e) {
-                if (e==null){
-                    List<String> checkList=new ArrayList<>();
-                    for (Group group:list){
+                if (e == null) {
+                    List<String> checkList = new ArrayList<>();
+                    for (Group group : list) {
                         checkList.addAll(group.getCheckin());
                     }
                     getCheckinDetail(checkList);
-                }else {
+                } else {
                     Log.d("getGroupCheckin", e.getMessage());
                 }
             }
         });
     }
 
-    private void getUserId(){
+    private void getUserId() {
         SharedPreferences sharedPreferences = getSharedPreferences("LoginState", MODE_PRIVATE);
         userid = sharedPreferences.getString("userID", "");
     }
 
     private void getCheckinDetail(final List<String> checkin) {
-        Log.d("MainActivity", checkin.toString());
-        BmobQuery<CheckIn> query = new BmobQuery<>();
-        query.addWhereContainedIn("objectId", checkin);
-        query.findObjects(new FindListener<CheckIn>() {
-            @Override
-            public void done(List<CheckIn> list, BmobException e) {
-                if (e == null) {
-                    refreshList(list);
-                } else {
-                    Log.d("Main", e.getMessage());
+        if (checkin == null) {
+            refreshLayout.setRefreshing(false);
+        } else {
+            Log.d("MainActivity", checkin.toString());
+            BmobQuery<CheckIn> query = new BmobQuery<>();
+            query.addWhereContainedIn("objectId", checkin);
+            query.findObjects(new FindListener<CheckIn>() {
+                @Override
+                public void done(List<CheckIn> list, BmobException e) {
+                    if (e == null) {
+                        refreshList(list);
+                    } else {
+                        Log.d("Main", e.getMessage());
+                    }
                 }
-            }
-        });
-
+            });
+        }
     }
 
     private void refreshList(List<CheckIn> list) {
         CheckIn temp = null;
         for (CheckIn checkIn : list) {
-            temp = new CheckIn(checkIn.getTitle(), checkIn.getOwner(), checkIn.getNum(),checkIn.getOwnerName());
+            temp = new CheckIn(checkIn.getTitle(), checkIn.getOwner(), checkIn.getNum(), checkIn.getOwnerName());
             temp.setId(checkIn.getObjectId());
             temp.setTime(checkIn.getCreatedAt());
             checkInList.add(temp);
@@ -255,12 +259,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void quitApplication(){
-        SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
-        SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putBoolean("isLogin",false);
+    private void quitApplication() {
+        SharedPreferences sharedPreferences = getSharedPreferences("LoginState", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isLogin", false);
         editor.commit();
-        Intent intent=getPackageManager().getLaunchIntentForPackage(getPackageName());
+        Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
@@ -328,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
             public void done(CheckIn checkIn, BmobException e) {
                 if (e == null) {
                     Log.e("MainActivity", checkIn.getTitle() + "," + checkIn.getOwner());
-                    CheckIn temp = new CheckIn(checkIn.getTitle(), checkIn.getOwner(), checkIn.getNum(),checkIn.getOwnerName());
+                    CheckIn temp = new CheckIn(checkIn.getTitle(), checkIn.getOwner(), checkIn.getNum(), checkIn.getOwnerName());
                     temp.setId(checkIn.getObjectId());
                     temp.setTime(checkIn.getCreatedAt());
                     checkInList.add(temp);

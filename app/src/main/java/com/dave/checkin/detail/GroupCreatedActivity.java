@@ -18,6 +18,7 @@ import com.dave.checkin.adapter.GroupMemberAdapter;
 import com.dave.checkin.beans.Group;
 import com.dave.checkin.beans.User;
 import com.dave.checkin.group.AddGroupCheckinActivity;
+import com.dave.checkin.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,6 @@ public class GroupCreatedActivity extends AppCompatActivity {
     private List<User> userList;
     private GroupMemberAdapter adapter;
 
-    private String ownerId;
     private String groupId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +68,6 @@ public class GroupCreatedActivity extends AppCompatActivity {
         created_group_owner.setText("创建者: "+i.getStringExtra("owner"));
         created_num.setText("群组成员: : "+i.getStringExtra("num")+"人");
 
-        ownerId=i.getStringExtra("ownerId");
         groupId=i.getStringExtra("id");
     }
 
@@ -132,7 +131,6 @@ public class GroupCreatedActivity extends AppCompatActivity {
 
     private void goToAddGroupCheckin(){
         Intent intent=new Intent(GroupCreatedActivity.this, AddGroupCheckinActivity.class);
-        intent.putExtra("ownerId",ownerId);
         intent.putExtra("groupId",groupId);
         startActivity(intent);
     }
@@ -145,12 +143,20 @@ public class GroupCreatedActivity extends AppCompatActivity {
             public void done(BmobException e) {
                 if(e==null){
                     Log.d("删除分组","删除成功");
-                    finish();
+                    setResultForDismiss();
                 }else {
                     Log.d("删除分组",e.getMessage());
                 }
             }
         });
+    }
+
+    private void setResultForDismiss(){
+        Intent intent=getIntent();
+        intent.putExtra("groupId",groupId);
+        setResult(Utils.RESULT_DISMISS_GROUP,intent);
+        Log.d("删除分组","返回创建群组主页页面");
+        finish();
     }
 
     @Override

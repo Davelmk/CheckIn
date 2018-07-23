@@ -21,6 +21,9 @@ public class Utils {
     public static final int REQUEST_JOIN_GROUP=4;
     public static final int RESULT_JOIN_GROUP=4;
 
+    public static final int RESULT_DISMISS_GROUP=5;
+    public static final int REQUEST_DETAIL_GROUP=6;
+
     public static int[] colors={R.color.colorSign1,R.color.colorSign2,
             R.color.colorSign3,R.color.colorSign4,R.color.colorSign5 ,R.color.colorSign6};
 

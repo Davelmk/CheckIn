@@ -73,12 +73,12 @@ public class AddGroupCheckinActivity extends AppCompatActivity {
 
     private void initBean(){
         Intent intent=getIntent();
-        ownerId=intent.getStringExtra("ownerId");
         groupId=intent.getStringExtra("groupId");
         Log.d("添加群组签到","groupId:"+groupId);
 
         SharedPreferences sharedPreferences=getSharedPreferences("LoginState",MODE_PRIVATE);
         ownerName=sharedPreferences.getString("userName","Dave");
+        ownerId=sharedPreferences.getString("userID","");
 
         checkIn=new CheckIn(checkin_title.getText().toString(),ownerId);
         checkIn.setDescription(checkin_description.getText().toString());
